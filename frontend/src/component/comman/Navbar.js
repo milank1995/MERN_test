@@ -1,15 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Link, NavLink, useParams} from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 
 const Navbar = () => {
     let {id} = useParams();
+    const history = useHistory();
     id = id ? id : JSON.parse(localStorage.getItem('userId'));
-    const [userData, setUserdata] = useState({});
 
-    useEffect(() => {
-        const users = localStorage.getItem("userData")
-        setUserdata(users);
-    }, []);
+    const handleLogout = () => {
+        localStorage.clear()
+        history.push("/")
+    }
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary ">
@@ -21,9 +22,9 @@ const Navbar = () => {
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="collapsenavbar">
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                        {localStorage.getItem('userId') && localStorage.getItem('token') && <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <NavLink className="nav-link" exact to={`/home/${id}`}>
+                                <NavLink className="nav-link" exact to={'/home'}>
                                     Home
                                 </NavLink>
                             </li>
@@ -32,9 +33,10 @@ const Navbar = () => {
                                     Profile
                                 </NavLink>
                             </li>
-                        </ul>
+                        </ul>}
                     </div>
-                    <Link className="btn btn-outline-light" to="/register">Register</Link>
+                    {!(localStorage.getItem('userId') && localStorage.getItem('token')) && <Link className="btn btn-outline-light" to="/register">Register</Link>}
+                    {(localStorage.getItem('userId') && localStorage.getItem('token')) && <Link className="btn btn-outline-light" onClick={handleLogout}>Log Out</Link>}
                 </div>
             </div>
         </nav>

@@ -1,18 +1,15 @@
 import React, {useState, useEffect} from "react";
 import axios from 'axios';
-import {Link, useHistory} from 'react-router-dom';
-import {useParams} from "react-router";
+import {useHistory} from 'react-router-dom';
 
 const Edit = (props) => {
-    const {id} = useParams();
+    const location = props.history.location.pathname.split('/');
+    let id = location[location.length -1];
     const [userSecret, setSecret] = useState(null);
-    const [userDetails, setUserDetails] = useState({
-
-    });
+    const [userDetails, setUserDetails] = useState({});
     useEffect(() => {
         const userToken = localStorage.getItem("token");
         setSecret(userToken);
-        console.log("user details from local storeg", userDetails);
         loadUser(userToken, id);
     }, []);
     const config = (userToken) => ({
@@ -24,8 +21,15 @@ const Edit = (props) => {
     });
     const loadUser = async (userToken, id) => {
         const result = await axios.get(`http://localhost:3001/user/${id}`, config(userToken));
-        setUserDetails(result.data);
-        console.log(result.data);
+        const data1 = {
+            firstName: result.data.firstName,
+            lastName: result.data.lastName,
+            dateOfBirth: result.data.dateOfBirth,
+            email: result.data.email,
+            contact: result.data.contact
+        }
+
+        setUserDetails(data1);
     };
     const [errors, setErrors] = useState({});
     let history = useHistory();
@@ -57,6 +61,21 @@ const Edit = (props) => {
                 } else {
                     return '';
                 }
+            case 'password':
+                if (!value) {
+                    return 'Password is required';
+                } else {
+                    return '';
+                }
+            case 'conformPassword':
+                if (userDetails.password !== userDetails.conformPassword && userDetails.conformPassword !== "") {
+                    return "password Miss match";
+                } else if (!value) {
+                    return 'Re-enter password';
+
+                } else {
+                    return '';
+                }
             default: {
                 return ''
             }
@@ -79,16 +98,12 @@ const Edit = (props) => {
             setErrors(validationErrors);
             return true;
         }
-        console.log("okk")
         const userId = JSON.parse(localStorage.getItem("userId"));
         const userToken = localStorage.getItem("token");
         await axios.put(`http://localhost:3001/editUser/${id}`,
             userDetails,
             {headers: {'Authorization': userToken}},)
             .then(res => {
-                console.log("log in then")
-                console.log("userDetils after edited data submit-->", userDetails)
-
                 if (!res.data) {
                     return;
                 } else {
@@ -166,27 +181,38 @@ const Edit = (props) => {
                 <p className="text-danger">{errors.contact}</p>
             </div>
 
-            {/*<div className="form-group">*/}
-            {/*    <label>Password</label>*/}
-            {/*    <input type="password"*/}
-            {/*           className="form-control"*/}
-            {/*           name="password"*/}
-            {/*           value={userDetails.password || ""}*/}
-            {/*           placeholder="Enter password"*/}
-            {/*           onChange={handleChange}/>*/}
-            {/*    <p className="text-danger">{errors.password}</p>*/}
-            {/*</div>*/}
+            <div className="form-group">
+                <label>Old Password</label>
+                <input type="password"
+                       className="form-control"
+                       name="oldPassword"
+                       value={userDetails.oldPassword || ""}
+                       placeholder="Enter Old password"
+                       onChange={handleChange}/>
+                <p className="text-danger">{errors.oldPassword}</p>
+            </div>
 
-            {/*<div className="form-group">*/}
-            {/*    <label>Conform Password</label>*/}
-            {/*    <input type="password"*/}
-            {/*           className="form-control"*/}
-            {/*           name="conformPassword"*/}
-            {/*           value={userDetails.conformPassword || ""}*/}
-            {/*           placeholder="Confirm password"*/}
-            {/*           onChange={handleChange}/>*/}
-            {/*    <p className="text-danger">{errors.conformPassword}</p>*/}
-            {/*</div>*/}
+            <div className="form-group">
+                <label>Password</label>
+                <input type="password"
+                       className="form-control"
+                       name="password"
+                       value={userDetails.password || ""}
+                       placeholder="Enter password"
+                       onChange={handleChange}/>
+                <p className="text-danger">{errors.password}</p>
+            </div>
+
+            <div className="form-group">
+                <label>Conform Password</label>
+                <input type="password"
+                       className="form-control"
+                       name="conformPassword"
+                       value={userDetails.conformPassword || ""}
+                       placeholder="Confirm password"
+                       onChange={handleChange}/>
+                <p className="text-danger">{errors.conformPassword}</p>
+            </div>
 
             <button onClick={handleSubmit} className="btn btn-dark btn-lg btn-block">Submit</button>
         </div>

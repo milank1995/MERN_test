@@ -125,10 +125,6 @@ const Register = () => {
         Object.keys(userDetails).forEach(key => {
             form.append(key, userDetails[key])
         });
-        for (const [key, value] of Object.entries(userDetails)) {
-            form.append(key, value)
-        }
-        console.log(JSON.stringify(form))
         const config = {
             headers: {
                 "Contetnt-Type": "multipart/form-data"

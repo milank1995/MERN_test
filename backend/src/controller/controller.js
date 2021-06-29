@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
         const user = await Register.findOne({email : req.body.email});
         if(!user){
             // Encrypt password
-            req.body.password = bcrypt.hashSync(req.body.password, 8);
+            payload.password = bcrypt.hashSync(req.body.password, 8);
             const register = await Register.create(payload);
             if(register){
                 res.status(200)
@@ -39,22 +39,20 @@ exports.login = async(req, res) => {
     try{
         console.log("try",req.body)
         const email = req.body.email;
-        console.log("email from body",email)
         const usermail = await Register.findOne({ email : email });    
-        // const dbpassword = usermail.password;
         if(usermail){
             const password = req.body.password;
             const result = bcrypt.compareSync(password, usermail.password)
-            if(password){
+            if(result){
                 //creat token using jwt
                 const token = await jwt.sign({email: req.body.email},process.env.JWT_SECRET,
                      {expiresIn:"30d"});
                 return res.status(200).send({auth:true, token:token, userData: usermail});
             }else{
-                console.log("password does not match");
+                return res.status(403).send("password does not match");
             }
         }else{
-            console.log("user not define")
+            return res.status(404).send()
         }
     }catch(error){
         console.log("catch")
@@ -83,9 +81,23 @@ exports.User = async(req,res) => {
 exports.editUser = async (req,res) =>{
     try{
         const id = req.params.id;
-        console.log(id);
-        const UpdateUser = await Register.findByIdAndUpdate( id,req.body,{new:true});
-        res.status(200).send(UpdateUser);
+        const email = req.body.email;
+        const user = await Register.findOne({ email : email }); 
+        const password = req.body.password;
+        const result = bcrypt.compareSync(password, user.password)
+        if(result){
+            if(req.body.password && user){
+                req.body.password = bcrypt.hashSync(req.body.password, 8);
+                const UpdateUser = await Register.findByIdAndUpdate( id,req.body,{new:true});
+                res.status(200).send(UpdateUser);
+            } else {
+                res.status(404).send();
+            }
+        } else {
+            res.status(403).send("password not matched");
+        }
+        
+        
     }catch(errror){
         res.status(400).send(error);
     }

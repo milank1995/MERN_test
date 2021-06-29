@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from "react";
 import profilePic from "../../assert/images/avatar.png";
 import "../profile/Profile.scss";
-import {useHistory, useParams} from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import {CameraOutlined} from "@ant-design/icons";
 import {Spin, Space} from 'antd';
 import axios from "axios";
 
 const Profile = (props) => {
-    let {id} = useParams();
-    id = id ? id : localStorage.getItem('userId');
+    const location = props.history.location.pathname.split('/');
+    let id = location[location.length -1];
+    id = id ? String(id).trim() : String(JSON.parse(localStorage.getItem('userId'))).trim();
     let history = useHistory();
     const [userValid, setValid] = useState({});
     const [user, setUser] = useState({});
@@ -16,7 +17,6 @@ const Profile = (props) => {
     const {name, email, contact} = user;
     useEffect(() => {
         const userToken = localStorage.getItem("token");
-        const userId = JSON.parse(localStorage.getItem("userId"));
         if (userToken && id) {
             loadUser(userToken, id);
         }
@@ -32,7 +32,7 @@ const Profile = (props) => {
         }
     });
 
-    const loadUser = async (userToken, id) => {
+    const loadUser = async (userToken, id) => {debugger
         console.log(("load User is loaded"))
         console.log(id)
         const result = await axios.get(`http://localhost:3001/user/${id}`, config(userToken));
@@ -42,7 +42,6 @@ const Profile = (props) => {
     }
 
     const Edit = async () => {
-        const userId = JSON.parse(localStorage.getItem("userId"))
         const userToken = localStorage.getItem("token")
         await axios.get(`http://localhost:3001/user/${id}`
             , {headers: {'Authorization': userToken}}

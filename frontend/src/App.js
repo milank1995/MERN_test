@@ -5,6 +5,7 @@ import Profile from './component/profile/Profile';
 import Register from './component/register/Register';
 import Edit from "./component/editUser/Edit";
 import Home from "./component/Home/Home";
+import PrivetRoute from "./component/comman/PrivetRoute";
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 
@@ -16,11 +17,10 @@ function App() {
                 <Switch>
                     <Route path="/register" component={Register}/>
                     <Route exact path="/" component={Login}/>
-                    <Route path="/profile/:id" component={Profile}/>
-                    <Route path="/profile" component={Profile}/>
-                    <Route path="/editUser/:id" component={Edit}/>
-                    <Route path="/home/:id" component={Home}/>
-
+                    <Route exact path="/login" component={Login}/>
+                    <PrivetRoute path="/profile/:id" component={Profile}/>
+                    <PrivetRoute path="/editUser/:id" component={Edit}/>
+                    <PrivetRoute path="/home" component={Home}/>
 
                 </Switch>
             </div>

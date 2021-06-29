@@ -116,9 +116,6 @@ const Login = () => {
                 </div>
 
                 <button type="submit" onClick={onSubmit} className="btn btn-dark btn-lg btn-block">Sign in</button>
-                <p className="forgot-password text-right">
-                    Forgot <Link href="#">password?</Link>
-                </p>
             </div>
 
         </div>

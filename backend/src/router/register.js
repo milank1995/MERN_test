@@ -1,6 +1,6 @@
 require("../model/register.model");
 const express = require("express");
-const register = require("../controller/register1");
+const register = require("../controller/controller");
 const validatior = require("../midleware/validateTokenJson");
 const router = express.Router();
 const multer  = require('multer');
